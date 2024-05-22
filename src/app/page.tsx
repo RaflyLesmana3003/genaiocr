@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from 'next/image'
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -106,7 +107,7 @@ export default function Home() {
             with a problem: the kingdom was running out of money.
           </p>
           <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-            The King's Plan
+            The King&apos;s Plan
           </h2>
           <p className="leading-7 [&:not(:first-child)]:mt-6">
             The king thought long and hard, and finally came up with{" "}
@@ -119,8 +120,8 @@ export default function Home() {
             : he would tax the jokes in the kingdom.
           </p>
           <blockquote className="mt-6 border-l-2 pl-6 italic">
-            "After all," he said, "everyone enjoys a good joke, so it's only fair
-            that they should pay for the privilege."
+            After all he said, everyone enjoys a good joke, so it&apos;s only fair
+            that they should pay for the privilege.
           </blockquote>
         </div>
       )}
@@ -129,7 +130,7 @@ export default function Home() {
       {selectedImage && (
         <div className="mb-4 w-full flex flex-col items-center">
           <div className="w-full h-1/2 flex justify-center rounded-lg">
-            <img src={selectedImage} alt="Selected" className="w-3/4 max-h-full object-cover rounded-lg shadow" />
+            <Image src={selectedImage} alt={"Selected"} width={10} height={10} className="w-3/4 max-h-full object-cover rounded-lg shadow"/>
           </div>
             <Progress value={uploadProgress} className="w-3/4 mt-4 rounded-lg"/>
 
@@ -150,7 +151,7 @@ export default function Home() {
       </div>
       )}
 
-      {ticket && (
+      {!status && ticket && (
         <div className="flex justify-center mb-32">
         <Card className="w-3/4">
           <CardHeader>
