@@ -68,8 +68,8 @@ export default function Home() {
           }
         } catch (error) {
           console.error('Error uploading image:', error);
-
-          toast.error(error);
+          
+          toast.error("Ticket gagal di scan, silahkan coba lagi.");
         }
       }
     };
