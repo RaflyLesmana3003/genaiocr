@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from 'next/image'
+import { upload } from "@vercel/blob/client";
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -43,32 +44,36 @@ export default function Home() {
           scrollToBottom();
         }, 500);
         
-        const formData = new FormData();
-        formData.append('image', fileToUpload);
-
+        const randomFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${fileToUpload.name}`;
         try {
-          const response = await axios.post('/api/scans/', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress: (progressEvent) => {
-              const total = progressEvent.total ?? 0; // Adjusted for lint error
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
-              setUploadProgress(percentCompleted);
-            },
+          const newBlob = await upload(randomFileName, fileToUpload, {
+            access: 'public',
+            handleUploadUrl: '/api/ticket/upload',
           });
 
-          if (response.status === 200 && response.data) {
-            setTicket(response.data.data);
-            toast.success("Ticket Berhasil di scan.");
-            setStatus(false)
-            setTimeout(() => {
-              scrollToBottom();
-            }, 500);
+          if (newBlob.url) {
+            const response = await axios.post('/api/scans/', { image: newBlob.url }, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              onUploadProgress: (progressEvent) => {
+                const total = progressEvent.total ?? 0;
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
+                setUploadProgress(percentCompleted);
+              },
+            });
+
+            if (response.status === 200 && response.data) {
+              setTicket(response.data.data);
+              toast.success("Ticket Berhasil di scan.");
+              setStatus(false);
+              setTimeout(() => {
+                scrollToBottom();
+              }, 500);
+            }
           }
         } catch (error) {
           console.error('Error uploading image:', error);
-          
           toast.error("Ticket gagal di scan, silahkan coba lagi.");
         }
       }

@@ -23,13 +23,18 @@ export async function POST(req: Request) {
    createdAt = Waktu Cetak`
 
    try {
-      const formData = await req.formData();
-      const imageFile = formData.get('image');
-      if (!imageFile || typeof imageFile === 'string') {
-         throw new Error('Image file is missing or invalid');
+      const json = await req.json();
+      const imageUrl = json.image;
+      if (!imageUrl || typeof imageUrl !== 'string') {
+         throw new Error('Image URL is missing or invalid');
       }
-      const imageBuffer = await imageFile.arrayBuffer();
-      const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+
+      const imageResponse = await fetch(imageUrl);
+      if (!imageResponse.ok) {
+         throw new Error('Failed to fetch image from URL');
+      }
+      const imageArrayBuffer = await imageResponse.arrayBuffer();
+      const imageBase64 = Buffer.from(imageArrayBuffer).toString('base64');
 
       const model = new ChatGoogleGenerativeAI({
          modelName: "gemini-1.5-flash-latest",
@@ -50,7 +55,6 @@ export async function POST(req: Request) {
             ],
          }),
       ];
-
       const res = await model.invoke(input);
       console.log(res.content);
 
@@ -67,7 +71,7 @@ export async function POST(req: Request) {
       return response;
    } catch (error) {
       console.log(error)
-      return new NextResponse(JSON.stringify({ error: 'Failed' }), {
+      return new NextResponse(JSON.stringify({ error: error }), {
          status: 500,
          headers: {
             'Content-Type': 'application/json',
