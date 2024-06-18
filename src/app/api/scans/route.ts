@@ -3,6 +3,7 @@ import { HumanMessage } from "@langchain/core/messages";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { MessageContent } from "langchain/schema";
 import { NextResponse } from "next/server";
+import { google } from "googleapis"
 
 export async function POST(req: Request) {
    const authHeader = req.headers.get('authorization');

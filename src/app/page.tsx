@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { ArrowUpFromLine, ShieldAlert } from "lucide-react";
+import { ArrowUpFromLine, ShieldAlert, Save } from "lucide-react";
 import React, { useEffect } from "react";
 import axios from 'axios';
 import { Ticket } from "@/type/ticket";
@@ -99,36 +99,61 @@ export default function Home() {
     }
   };
 
+  const handleSave = async () => {
+    try{
+        const response = await axios.post('/api/ticket/create', { 
+          ticketNumber: ticket.ticketNumber,
+          supplier: ticket.supplier,
+          product: ticket.product,
+          payloadVolume: ticket.payloadVolume,
+          carNumber: ticket.carNumber,
+          scannedPayloadAt: ticket.scannedPayloadAt,
+          scannedEmptyAt: ticket.scannedEmptyAt,
+          operator: ticket.operator,
+          createdAt: ticket.createdAt,
+          }, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.status === 200 && response.data) {
+          toast.success("Ticket Berhasil di simpan.");
+        }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error("Ticket menyimpan di scan, silahkan coba lagi.");
+    }
+  };
+
 
   return (
     <main className="min-h-64">
       {!selectedImage && (
         <div className="flex justify-center flex-col px-5 mb-24">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-            Scan tiket payload
-          </h1>
+          <header className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            Solusi Tepat Kelola Proyek Bongkar-Muat
+          </header>
           <p className="leading-7 [&:not(:first-child)]:mt-6">
-            Once upon a time, in a far-off land, there was a very lazy king who
-            spent all day lounging on his throne. One day, his advisors came to him
-            with a problem: the kingdom was running out of money.
+            Platform digital untuk kelancaran manajemen proyek Bongkar-Muat Anda yang lebih aman & transparan
           </p>
-          <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-            The King&apos;s Plan
+          <h2 className="my-10 scroll-m-20 border-b pb-2 text-md font-semibold tracking-tight transition-colors first:mt-0 text-primary">
+            Kelola aktivitas armada truk Anda jadi lebih mudah, efektif & lancar jaya
           </h2>
-          <p className="leading-7 [&:not(:first-child)]:mt-6">
-            The king thought long and hard, and finally came up with{" "}
-            <a
-              href="#"
-              className="font-medium text-primary underline underline-offset-4"
-            >
-              a brilliant plan
-            </a>
-            : he would tax the jokes in the kingdom.
-          </p>
-          <blockquote className="mt-6 border-l-2 pl-6 italic">
-            After all he said, everyone enjoys a good joke, so it&apos;s only fair
-            that they should pay for the privilege.
-          </blockquote>
+          <div className="flex flex-col gap-5">
+            <div>
+              <span className="font-semibold">1. Pantau aktivitas pengiriman secara real-time</span>
+              <p>Dapatkan laporan aktivitas pengiriman secepat kilat dan akurat, lupakan cara manual yang terlalu lama & rentan kesalahan pencatatan.</p>
+            </div>
+            <div>
+              <span className="font-semibold">2. Sistem pembayaran yang lebih aman</span>
+              <p>Hindari kerugian dari berbagai risiko penyelewengan / penyalahgunaan dana dengan sistem pembayaran yang lebih aman & terpercaya.</p>
+            </div>
+            <div>
+              <span className="font-semibold">3. Otomatisasi rekap surat jalan & penagihan</span>
+              <p>Optimalkan rekapitulasi surat jalan serta penerbitan tagihan yang terintegrasi secara otomatis, terangkum dengan lengkap, dan disajikan dalam satu platform.</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -162,96 +187,73 @@ export default function Home() {
         <Card className="w-3/4">
           <CardHeader>
             <CardTitle><Badge variant="outline">Hasil ticket</Badge></CardTitle>
-            <CardDescription>No. {ticket.ticketNumber} - {ticket.createdAt}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Volume Muatan
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.payloadVolume}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="ticketNumber" className="text-sm text-muted-foreground">
+                No Ticket
+              </label>
+              <Input id="ticketNumber" type="text" value={ticket.ticketNumber} onChange={(e) => setTicket({ ...ticket, ticketNumber: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Barang
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.product}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="volumeMuatan" className="text-sm text-muted-foreground">
+                Volume Muatan
+              </label>
+              <Input id="volumeMuatan" type="text" value={ticket.payloadVolume} onChange={(e) => setTicket({ ...ticket, payloadVolume: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Pemasok
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.supplier}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="barang" className="text-sm text-muted-foreground">
+                Barang
+              </label>
+              <Input id="barang" type="text" value={ticket.product} onChange={(e) => setTicket({ ...ticket, product: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Operator
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.operator}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="pemasok" className="text-sm text-muted-foreground">
+                Pemasok
+              </label>
+              <Input id="pemasok" type="text" value={ticket.supplier} onChange={(e) => setTicket({ ...ticket, supplier: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  No. Kendaraan
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.carNumber}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="operator" className="text-sm text-muted-foreground">
+                Operator
+              </label>
+              <Input id="operator" type="text" value={ticket.operator} onChange={(e) => setTicket({ ...ticket, operator: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Scan Isi
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.scannedEmptyAt}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="noKendaraan" className="text-sm text-muted-foreground">
+                No. Kendaraan
+              </label>
+              <Input id="noKendaraan" type="text" value={ticket.carNumber} onChange={(e) => setTicket({ ...ticket, carNumber: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
-            <div className="flex flex-column gap-2 justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Scan Kosong
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {ticket.scannedPayloadAt}
-                </p>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="scanIsi" className="text-sm text-muted-foreground">
+                Scan Isi
+              </label>
+              <Input id="scanIsi" type="text" value={ticket.scannedEmptyAt} onChange={(e) => setTicket({ ...ticket, scannedEmptyAt: e.target.value })} className="text-sm font-medium leading-none" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="scanKosong" className="text-sm text-muted-foreground">
+                Scan Kosong
+              </label>
+              <Input id="scanKosong" type="text" value={ticket.scannedPayloadAt} onChange={(e) => setTicket({ ...ticket, scannedPayloadAt: e.target.value })} className="text-sm font-medium leading-none" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="createdAt" className="text-sm text-muted-foreground">
+                Created At
+              </label>
+              <Input id="createdAt" type="text" value={ticket.createdAt} onChange={(e) => setTicket({ ...ticket, createdAt: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
           </CardContent>
-          <CardFooter>
-            <ShieldAlert className="mr-2 h-4 w-4 text-destructive" /> <span className="text-xs text-gray-500 mt-2 inline">Kemungkinan ada kesalahan mohon untuk di cek kembali.</span>
+          <CardFooter className="flex flex-col">
+          <Button onClick={handleSave} variant="outline" className="bg-primary text-white" size={'lg'}>
+            <Save className="mr-2 h-4 w-4" />
+            <span>Ubah dan Simpan</span>
+          </Button>
+
+            <div className="flex items-center">
+              <ShieldAlert className="mr-2 h-4 w-4 text-destructive" /> 
+              <span className="text-xs text-gray-500 mt-2 inline">Kemungkinan ada kesalahan mohon untuk di cek kembali.</span>
+            </div>
           </CardFooter>
         </Card>
         </div>
@@ -260,7 +262,7 @@ export default function Home() {
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-80 py-3 px-1 mb-3 flex flex-col items-center rounded-md">
         <Button onClick={handleClick} variant="outline" className="bg-primary text-white" size={'lg'}>
           <ArrowUpFromLine className="mr-2 h-4 w-4" />
-          <span>Upload Foto</span>
+          <span>Scan Surat Jalan</span>
         </Button>
 
         <Input id="picture" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
