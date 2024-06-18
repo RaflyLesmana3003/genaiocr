@@ -11,8 +11,8 @@ export async function POST(req: Request) {
 
       (async () => {
         const auth = new google.auth.JWT({
-          email: process.env.GOOGLE_EMAIL_SERVICE_ACCOUNT,
-          key: process.env.GOOGLE_KEY_SERVICE_ACCOUNT,
+          email: process.env.NEXT_PUBLIC_GOOGLE_EMAIL_SERVICE_ACCOUNT,
+          key: process.env.NEXT_PUBLIC_GOOGLE_KEY_SERVICE_ACCOUNT,
           scopes: ["https://www.googleapis.com/auth/spreadsheets"]
         })
         const sheet = google.sheets("v4")
