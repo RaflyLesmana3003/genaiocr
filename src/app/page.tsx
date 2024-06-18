@@ -122,7 +122,7 @@ export default function Home() {
         }
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error("Ticket menyimpan di scan, silahkan coba lagi.");
+      toast.error("Ticket gagal di simpan, silahkan coba lagi.");
     }
   };
 
