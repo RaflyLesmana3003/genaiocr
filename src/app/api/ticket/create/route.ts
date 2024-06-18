@@ -9,7 +9,7 @@ export async function POST(req: Request) {
    try {
       const json = await req.json();
 
-      (async () => {
+      try {
         const auth = new google.auth.JWT({
           email: process.env.NEXT_PUBLIC_GOOGLE_EMAIL_SERVICE_ACCOUNT,
           key: process.env.NEXT_PUBLIC_GOOGLE_KEY_SERVICE_ACCOUNT,
@@ -35,7 +35,11 @@ export async function POST(req: Request) {
             ]]
           }
         })
-      })()
+      } catch (error) {
+        if (error) {
+          throw error;
+        }
+      }
 
       const baseResponse: BaseResponse<MessageContent> = {
         status: 0,
