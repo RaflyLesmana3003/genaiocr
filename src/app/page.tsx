@@ -19,6 +19,7 @@ export default function Home() {
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [fileToUpload, setFileToUpload] = React.useState(null);
   const [ticket, setTicket] = React.useState<Ticket | null>(null);
+  const [scannedImage, setScannedImage] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState(false)
 
   const scrollToBottom = () => {
@@ -38,7 +39,9 @@ export default function Home() {
   React.useEffect(() => {
     const uploadImage = async () => {
       if (fileToUpload) {
-        toast.info("Ticket sedang di process.");
+        toast.info("Ticket sedang di process...", {
+          position: "top-center",
+        });
         setStatus(true);
         setTimeout(() => {
           scrollToBottom();
@@ -65,7 +68,10 @@ export default function Home() {
 
             if (response.status === 200 && response.data) {
               setTicket(response.data.data);
-              toast.success("Ticket Berhasil di scan.");
+              setScannedImage(newBlob.url)
+              toast.success("Ticket Berhasil di scan.", {
+                position: "top-center",
+              });
               setStatus(false);
               setTimeout(() => {
                 scrollToBottom();
@@ -74,7 +80,9 @@ export default function Home() {
           }
         } catch (error) {
           console.error('Error uploading image:', error);
-          toast.error("Ticket gagal di scan, silahkan coba lagi.");
+          toast.error("Ticket gagal di scan, silahkan coba lagi.", {
+            position: "top-center",
+          });
         }
       }
     };
@@ -88,10 +96,15 @@ export default function Home() {
       setSelectedImage(URL.createObjectURL(file));
       setUploadProgress(0);
       setFileToUpload(file);
+    } else {
+      setFileToUpload(null);
     }
+
+    const pictureInput = document.getElementById('picture') as HTMLInputElement;
+    pictureInput.value = '';
   };
 
-  const handleClick = () => {
+  const handleFileClick = () => {
     const pictureInput = document.getElementById('picture') as HTMLInputElement;
     if (pictureInput) {
       pictureInput.click();
@@ -101,16 +114,22 @@ export default function Home() {
 
   const handleSave = async () => {
     try{
+      toast.success("Ticket sedang simpan...", {
+        position: "top-center",
+      });
+
         const response = await axios.post('/api/ticket/create', { 
           ticketNumber: ticket.ticketNumber,
-          supplier: ticket.supplier,
-          product: ticket.product,
           payloadVolume: ticket.payloadVolume,
+          product: ticket.product,
+          supplier: ticket.supplier,
+          driver: ticket.driver,
           carNumber: ticket.carNumber,
           scannedPayloadAt: ticket.scannedPayloadAt,
           scannedEmptyAt: ticket.scannedEmptyAt,
           operator: ticket.operator,
           createdAt: ticket.createdAt,
+          imageUrl: scannedImage,
           }, {
           headers: {
             'Content-Type': 'application/json',
@@ -118,12 +137,18 @@ export default function Home() {
         });
 
         if (response.status === 200 && response.data) {
-          toast.success("Ticket Berhasil di simpan.");
+          toast.success("Ticket Berhasil di simpan.", {
+            position: "top-center",
+          });
         }
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error("Ticket gagal di simpan, silahkan coba lagi.");
-    }
+      toast.error("Ticket gagal di simpan, silahkan coba lagi.", {
+        position: "top-center",
+      });
+    } 
+
+    setFileToUpload(null);
   };
 
 
@@ -220,6 +245,12 @@ export default function Home() {
               <Input id="operator" type="text" value={ticket.operator} onChange={(e) => setTicket({ ...ticket, operator: e.target.value })} className="text-sm font-medium leading-none" />
             </div>
             <div className="flex flex-col gap-2">
+              <label htmlFor="driver" className="text-sm text-muted-foreground">
+                Driver
+              </label>
+              <Input id="driver" type="text" value={ticket.driver} onChange={(e) => setTicket({ ...ticket, driver: e.target.value })} className="text-sm font-medium leading-none" />
+            </div>
+            <div className="flex flex-col gap-2">
               <label htmlFor="noKendaraan" className="text-sm text-muted-foreground">
                 No. Kendaraan
               </label>
@@ -245,9 +276,9 @@ export default function Home() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
-          <Button onClick={handleSave} variant="outline" className="bg-primary text-white" size={'lg'}>
+          <Button onClick={handleSave} className="bg-primary text-white mb-2" size={'lg'} >
             <Save className="mr-2 h-4 w-4" />
-            <span>Ubah dan Simpan</span>
+            <span>Simpan</span>
           </Button>
 
             <div className="flex items-center">
@@ -259,14 +290,16 @@ export default function Home() {
         </div>
       
       )}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-80 py-3 px-1 mb-3 flex flex-col items-center rounded-md">
-        <Button onClick={handleClick} variant="outline" className="bg-primary text-white" size={'lg'}>
-          <ArrowUpFromLine className="mr-2 h-4 w-4" />
-          <span>Scan Surat Jalan</span>
-        </Button>
+      {!status &&
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-80 py-3 px-1 mb-3 flex flex-col items-center rounded-md">
+          <Button onClick={handleFileClick} variant="outline" className="bg-primary text-white" size={'lg'}>
+            <ArrowUpFromLine className="mr-2 h-4 w-4" />
+            <span>Scan Surat Jalan</span>
+          </Button>
 
-        <Input id="picture" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-      </div>
+          <Input id="picture" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+        </div>
+      }
     </main>
   );
 }

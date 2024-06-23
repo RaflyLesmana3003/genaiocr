@@ -1,5 +1,6 @@
 export interface Ticket {
     carNumber: string;
+    driver: string;
     createdAt: string;
     operator: string;
     payloadVolume: string;

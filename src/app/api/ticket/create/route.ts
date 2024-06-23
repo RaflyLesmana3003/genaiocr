@@ -25,14 +25,17 @@ export async function POST(req: Request) {
           requestBody: {
             values: [[
                 json.ticketNumber,
-                json.supplier,
-                json.product,
                 json.payloadVolume,
+                json.product,
+                json.supplier,
+                json.operator,
+                json.driver,
                 json.carNumber,
                 json.scannedPayloadAt,
                 json.scannedEmptyAt,
-                json.operator,
                 json.createdAt,
+                json.imageUrl,
+                new Date().toLocaleDateString("en-US", {year: 'numeric', month: '2-digit', day: '2-digit'}),
             ]]
           }
         })

@@ -14,6 +14,7 @@ export async function POST(req: Request) {
    you should response with this output format and rule, if no data, add null
    
    ticketNumber = No. Ticket
+   driver = driver name
    carNumber = No. Kendaraan
    product = Nama Barang
    supplier = Pemasok
